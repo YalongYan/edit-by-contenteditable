@@ -72,10 +72,10 @@ module.exports = {
       },
       {
       　　test: /\.(svg|ttf|eot|woff|woff2)$/, 
-      　　loader: 'url-loader', 
+      　　loader: 'url-loader',
       　　options:{ 
-  　　　　   name:'fonts/[name].[ext]',
-            limit: 9999999
+  　　　　   name:'fonts/[name].[ext]'
+            // limit: 9999999 // 这个可以让字体图标都打包进js里
       　　} 
       }
     ]

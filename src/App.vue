@@ -1,20 +1,22 @@
 <template>
   <div>
-    <Main/>
+    <ContendEdit ref="contendEdit" :messageDescStr.sync="messageDescStr"/>
+    <!-- <ContendEdit ref="contendEdit"/> -->
   </div>
 </template>
 
 <script>
-import Main from './components/Main'
+import ContendEdit from './components/common/contendEdit'
 
 export default {
   name: 'app',
   data () {
     return {
+      messageDescStr: 'sss' + '[FORM_NAME]'
     }
   },
   components: {
-    Main
+    ContendEdit
   }
 }
 </script>
