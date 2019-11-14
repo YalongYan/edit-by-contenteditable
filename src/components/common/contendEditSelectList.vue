@@ -15,19 +15,28 @@ export default {
     selectItemIndex: {
       type: Number,
       default: 0
+    },
+    selectDataList: {
+      type: Object,
+      default: {}
     }
   },
   data () {
     return {
-      list: ['FORM_NAME', 'STAFF_SCOPE', 'START_TIME']
+      // list: ['FORM_NAME', 'STAFF_SCOPE', 'START_TIME']
     }
   },
   methods: {
     itemClick (str) {
+      console.log(str)
       this.$emit('itemClick', str)
     }
   },
   computed: {
+    list: function () {
+      // 返回key的数组
+      return Object.keys(this.selectDataList)
+    }
   }
 }
 </script>

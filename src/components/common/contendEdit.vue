@@ -2,6 +2,7 @@
 <div class="editContentCtn">
   <div id="messageDesc" contenteditable="true" v-html="parseContendMsg"
     @keyup="contenteditableKeyUp"
+    @keydown="contenteditableKeyDown"
     @blur="contendEditBlur"
     @click="contendEditClick"
   >
@@ -11,6 +12,7 @@
   <ContendEditSelectList
     v-if="showContentEdit"
     :left="left"
+    :selectDataList="selectDataList"
     :selectItemIndex="selectItemIndex"
     @itemClick="itemClick"/>
 </div>
@@ -19,6 +21,7 @@
 <script>
 import ContendEditSelectList from './contendEditSelectList'
 
+let lastSelection = ''
 let lastEditRange = '' // 光标最后位置
 
 export default {
@@ -26,6 +29,10 @@ export default {
     messageDescStr: {
       type: String,
       default: ''
+    },
+    selectDataList: {
+      type: Object,
+      default: {}
     }
   },
   data () {
@@ -40,6 +47,7 @@ export default {
   methods: {
     // 点击空白的背景
     selectCtnBgCoverClick () {
+      debugger
       this.showContentEdit = false
       this.insertChildIndex = 0
       this.selectItemIndex = 0
@@ -56,34 +64,36 @@ export default {
       })
     },
     contendEditClick () {
+      this.setLastEditRange()
+    },
+    setLastEditRange () {
+      console.log('删除')
       let selection = window.getSelection ? window.getSelection() : document.selection
       let range = selection.createRange ? selection.createRange() : selection.getRangeAt(0)
+      lastSelection = selection
       lastEditRange = range
     },
+    getShowValueByCode (code) {
+      //
+    },
     itemClick (str) {
+      // console.log(str)
       // 创建节点
       let node = document.createElement('span')
       node.setAttribute('node', str)
       node.className = 'keyWord'
-      node.textContent = str
-      // 开始插入节点
-      let sel = null
-      if (document.selection) { // IE9以下
-        sel = document.selection
-        sel.createRange().pasteHTML(node)
-      } else {
-        sel = window.getSelection()
-      }
-      if (sel.rangeCount > 0) {
-        let range = sel.getRangeAt(0) // 获取选择范围
+      node.textContent = this.selectDataList[str]
+      if (lastSelection.rangeCount > 0) {
+        let range = lastSelection.getRangeAt(0) // 获取选择范围
         range.deleteContents() // 删除选中的内容
         range.insertNode(node) // 设置选择范围的内容为插入的内容
-        sel.removeAllRanges() // 移出所有选区
+        lastSelection.removeAllRanges() // 移出所有选区
       }
       this.showContentEdit = false
       let result = this.getMessageDesc()
       this.selectItemIndex = 0
       this.$nextTick(() => {
+        console.log(result)
         this.$emit('update:messageDescStr', result)
         if (lastEditRange) {
           setTimeout(() => {
@@ -92,13 +102,15 @@ export default {
             // let range = window.getSelection() // 创建range
             // range.selectAllChildren(obj) // range 选择obj下所有子内容
             // range.collapseToEnd() // 光标移至最后
+            console.log(this.insertChildIndex)
+            console.log(obj.childNodes)
             let innerDivText = obj.childNodes[this.insertChildIndex + 2] // 1 是移动到插入节点的最后  2是移动到插入节点的下一个节点后面，相当于在插入节点后面的空格插入光标
             if (innerDivText.length > 0) {
-              sel.collapse(innerDivText, 1)
+              lastSelection.collapse(innerDivText, 1)
             } else {
-              sel.collapse(innerDivText, 0)
+              lastSelection.collapse(innerDivText, 0)
             }
-          }, 0)
+          }, 10)
         }
       })
     },
@@ -119,42 +131,91 @@ export default {
       }
     },
     contenteditableKeyUp (e) {
+      if (e.keyCode === 8 || e.keyCode === 46) { // 删除的时候 也的重置光标
+        this.$nextTick(() => {
+          this.setLastEditRange()
+        })
+      }
+      if (e.keyCode === 37 || e.keyCode === 39) {
+        this.setLastEditRange()
+      }
+      let parentNode = getSelection().anchorNode.parentElement
+      let classKeyWord = parentNode.className
+      if (e.keyCode === 51) { // 输入#
+        let obj = document.querySelector('#messageDesc')
+        let contentStr = obj.textContent
+        let index = contentStr.indexOf('#')
+        let subStr = contentStr.substring(0, index + 1)
+        let positionLeft = 0
+        for (let i = 0; i < subStr.length; i++) {
+          let ii = subStr.charAt(i)
+          if (ii.trim().length === 0 || /[0-9a-zA-Z]/.test(ii)) {
+            positionLeft += 4
+          } else {
+            positionLeft += 14
+          }
+        }
+        let realWidth = obj.getBoundingClientRect().width
+        positionLeft = positionLeft % realWidth // 换行的情况下
+        positionLeft += 'px'
+        // let positionLeft = index * 14 + 'px'
+        this.left = positionLeft
+        this.showContentEdit = true
+        // 获取 # 的childNode
+        for (let i = 0; i < obj.childNodes.length; i++) {
+          if (obj.childNodes[i].textContent.indexOf('#') >= 0) {
+            this.insertChildIndex = i
+            break
+          }
+        }
+      }
+    },
+    // keydown 的时候 就把光标往后移动一位 移动到span后面的node里面
+    contenteditableKeyDown (e) {
+      // console.log(e.keyCode)
+      // 移动光标 跟上面的点击 每次都要获取最新的光标位置
       let parentNode = getSelection().anchorNode.parentElement
       let classKeyWord = parentNode.className
       if (classKeyWord === 'keyWord') {
-        // 在span内输入# 要把#替换掉，输入删除，回删 要把整个span去掉
-        // this.$t(parentNode.getAttribute('node')) !== parentNode.textContent 为了解决 span标签 末尾删除 bug
-        // span 标签内部禁止输入  输入就删除节点
-        if ((e.keyCode !== 37 && e.keyCode !== 38 && e.keyCode !== 39 && e.keyCode !== 40) && (parentNode.getAttribute('node') !== parentNode.textContent)) {
-          parentNode.parentNode.removeChild(parentNode)
-        }
-      } else {
-        if (e.keyCode === 51) { // 输入#
-          let obj = document.querySelector('#messageDesc')
-          let contentStr = obj.textContent
-          let index = contentStr.indexOf('#')
-          let subStr = contentStr.substring(0, index + 1)
-          let positionLeft = 0
-          for (let i = 0; i < subStr.length; i++) {
-            let ii = subStr.charAt(i)
-            if (ii.trim().length === 0 || /[0-9a-zA-Z]/.test(ii)) {
-              positionLeft += 4
-            } else {
-              positionLeft += 14
+        if ((e.keyCode !== 37 && e.keyCode !== 38 && e.keyCode !== 39 && e.keyCode !== 40)) {
+          let obj = document.getElementById('messageDesc')
+          let position = 0
+          for (let j = 0; j < obj.childNodes.length; j++) {
+            if (obj.childNodes[j] === lastEditRange.endContainer.parentNode) {
+              position = j + 1
             }
           }
-          let realWidth = obj.getBoundingClientRect().width
-          positionLeft = positionLeft % realWidth // 换行的情况下
-          positionLeft += 'px'
-          // let positionLeft = index * 14 + 'px'
-          this.left = positionLeft
-          this.showContentEdit = true
-          // 获取 # 的childNode
-          for (let i = 0; i < obj.childNodes.length; i++) {
-            if (obj.childNodes[i].textContent.indexOf('#') >= 0) {
-              this.insertChildIndex = i
-              break
-            }
+          if (getSelection().focusOffset === parentNode.textContent.trim().length && e.keyCode !== 8) { // span标签尾部输入 code18是删除 就直接删除
+            this.$nextTick(() => {
+              let sel = null
+              if (document.selection) { // IE9以下
+                sel = document.selection
+                sel.createRange().pasteHTML()
+              } else {
+                sel = window.getSelection()
+              }
+              if (obj.childNodes.length - 1 <= position) { // 在最后 而且最后还没其他node节点 那么就在最后插入一个空格节点
+                obj.innerHTML = obj.innerHTML + '&nbsp;'
+              }
+              let textContent = obj.childNodes[position].textContent
+              if (obj.childNodes[position]) {
+                if (obj.childNodes[position].nodeType === 1) { // span节点
+                  let emptyNode = document.createTextNode(' ')
+                  obj.insertBefore(emptyNode, obj.childNodes[position])
+                } else if (textContent.charAt(0) !== ' ') { // 后面的文本节点开头不是空格  就加个空格
+                  obj.childNodes[position].textContent = ' ' + textContent
+                }
+              }
+              obj.focus() // 解决ff不获取焦点无法定位问题
+              let innerDivText = obj.childNodes[position] // 1 是移动到插入节点的最后  2是移动到插入节点的下一个节点后面，相当于在插入节点后面的空格插入光标
+              if (innerDivText.length > 0) {
+                sel.collapse(innerDivText, 1)
+              } else {
+                sel.collapse(innerDivText, 0)
+              }
+            })
+          } else {
+            parentNode.parentNode.removeChild(parentNode)
           }
         }
       }
@@ -186,8 +247,7 @@ export default {
         let endIndex = str.indexOf(']')
         if (str.indexOf('[') === 0) {
           let code = str.substring(startIndex + 1, endIndex)
-          // result += '<span class="keyWord" node="' + code + '">' + this.$t(code) + '</span>'
-          result += '&nbsp;<span class="keyWord" node="' + code + '">' + code + '</span>&nbsp;'
+          result += '&nbsp;<span class="keyWord" node="' + code + '">' + this.selectDataList[code] + '</span>&nbsp;'
           str = str.substring(endIndex + 1)
         } else {
           subStr = str.substring(0, startIndex)
@@ -239,14 +299,12 @@ export default {
 </script>
 <style lang="scss">
 .editContentCtn{
-  font-family: 'PingFang SC', 'Helvetica', 'NotoSans', 'Roboto', 'Tahoma', 'Hiragino Sans GB', 'Arial', 'Microsoft YaHei', 'Sans-serif';
   position: relative;
   padding: 0 8px;
-  border: 1px solid black;
-  border-radius: 3px;
+  border-radius: 2px;
+  border: 1px solid #d0d0d0;
   line-height: 32px;
   font-size: 14px;
-  outline: none;;
 
   .selectCtnBgCover{
     position: fixed;
@@ -260,8 +318,7 @@ export default {
     z-index: 2
   }
   #messageDesc {
-    border: none;
-    outline: none;
+    outline: none!important;
 
     .keyWord{
       color: #6790DA;
