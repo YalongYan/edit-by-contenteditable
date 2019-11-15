@@ -7,17 +7,17 @@
 </template>
 
 <script>
-import ContendEdit from './components/contendEdit'
+import ContendEdit from "./components/contendEdit"
 
 export default {
-  name: 'app',
+  name: "app",
   data () {
     return {
-      messageDescStr: 'sss' + '[FORM_NAME]', // 来个默认值
+      messageDescStr: "sss" + "[FORM_NAME]", // 来个默认值
       selectDataList: { // 下来框的值
-        'FORM_NAME': '表单名称',
-        'STAFF_SCOPE': '表单范围',
-        'START_TIME': '填报时间'
+        "FORM_NAME": "表单名称",
+        "STAFF_SCOPE": "表单范围",
+        "START_TIME": "填报时间"
       }
     }
   },

@@ -10,7 +10,7 @@ export default {
   props: {
     left: {
       type: String,
-      default: '0px'
+      default: "0px"
     },
     selectItemIndex: {
       type: Number,
@@ -18,7 +18,9 @@ export default {
     },
     selectDataList: {
       type: Object,
-      default: {}
+      default: () => {
+        return {}
+      }
     }
   },
   data () {
@@ -28,7 +30,7 @@ export default {
   },
   methods: {
     itemClick (str) {
-      this.$emit('itemClick', str)
+      this.$emit("itemClick", str)
     }
   },
   computed: {

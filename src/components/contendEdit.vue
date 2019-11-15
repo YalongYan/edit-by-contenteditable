@@ -1,9 +1,9 @@
 <template>
 <div class="editContentCtn">
   <div id="messageDesc" contenteditable="true" v-html="parseContendMsg"
-    @keyup="contenteditableKeyUp"
-    @keydown="contenteditableKeyDown"
-    @blur="contendEditBlur"
+    @keyup = "contenteditableKeyUp"
+    @keydown = "contenteditableKeyDown"
+    @blur = "contendEditBlur"
     @click="contendEditClick"
   >
     <!-- 撒打算 <span class="keyWord" contenteditable="false" node="1">我的表单</span> &nbsp; -->
@@ -19,28 +19,30 @@
 </template>
 
 <script>
-import ContendEditSelectList from './contendEditSelectList'
+import ContendEditSelectList from "./contendEditSelectList"
 
-let lastSelection = ''
-let lastEditRange = '' // 光标最后位置
+let lastSelection = ""
+let lastEditRange = "" // 光标最后位置
 
 export default {
   props: {
     messageDescStr: {
       type: String,
-      default: ''
+      default: ""
     },
     selectDataList: {
       type: Object,
-      default: {}
+      default: () => {
+        return {}
+      }
     }
   },
   data () {
     return {
-      left: '0',
+      left: "0",
       showContentEdit: false,
       selectItemIndex: 0, // # 所在的index
-      selectList: ['FORM_NAME', 'STAFF_SCOPE', 'START_TIME'],
+      selectList: ["FORM_NAME", "STAFF_SCOPE", "START_TIME"],
       insertChildIndex: 0 // 光标插入位置
     }
   },
@@ -52,11 +54,11 @@ export default {
       this.selectItemIndex = 0
       // let result = this.getMessageDesc()
       this.$nextTick(() => {
-        let obj = document.getElementById('messageDesc')
+        let obj = document.getElementById("messageDesc")
         for (let i = 0; i < obj.childNodes.length; i++) {
           let str = obj.childNodes[i].textContent
-          if (str.indexOf('#') >= 0) {
-            obj.childNodes[i].textContent = str.replace('#', '')
+          if (str.indexOf("#") >= 0) {
+            obj.childNodes[i].textContent = str.replace("#", "")
           }
         }
         // this.$emit('update:messageDescStr', result)
@@ -71,14 +73,14 @@ export default {
       lastSelection = selection
       lastEditRange = range
     },
-    getShowValueByCode (code) {
-      //
-    },
+    // getShowValueByCode (code) {
+    //   //
+    // },
     itemClick (str) {
       // 创建节点
-      let node = document.createElement('span')
-      node.setAttribute('node', str)
-      node.className = 'keyWord'
+      let node = document.createElement("span")
+      node.setAttribute("node", str)
+      node.className = "keyWord"
       node.textContent = this.selectDataList[str]
       if (lastSelection.rangeCount > 0) {
         let range = lastSelection.getRangeAt(0) // 获取选择范围
@@ -90,10 +92,10 @@ export default {
       let result = this.getMessageDesc()
       this.selectItemIndex = 0
       this.$nextTick(() => {
-        this.$emit('update:messageDescStr', result)
+        this.$emit("update:messageDescStr", result)
         if (lastEditRange) {
           setTimeout(() => {
-            let obj = document.getElementById('messageDesc')
+            let obj = document.getElementById("messageDesc")
             obj.focus() // 解决ff不获取焦点无法定位问题
             // let range = window.getSelection() // 创建range
             // range.selectAllChildren(obj) // range 选择obj下所有子内容
@@ -132,12 +134,12 @@ export default {
       if (e.keyCode === 37 || e.keyCode === 39) {
         this.setLastEditRange()
       }
-      let parentNode = getSelection().anchorNode.parentElement
-      let classKeyWord = parentNode.className
+      // let parentNode = getSelection().anchorNode.parentElement
+      // let classKeyWord = parentNode.className
       if (e.keyCode === 51) { // 输入#
-        let obj = document.querySelector('#messageDesc')
+        let obj = document.querySelector("#messageDesc")
         let contentStr = obj.textContent
-        let index = contentStr.indexOf('#')
+        let index = contentStr.indexOf("#")
         let subStr = contentStr.substring(0, index + 1)
         let positionLeft = 0
         for (let i = 0; i < subStr.length; i++) {
@@ -150,13 +152,13 @@ export default {
         }
         let realWidth = obj.getBoundingClientRect().width
         positionLeft = positionLeft % realWidth // 换行的情况下
-        positionLeft += 'px'
+        positionLeft += "px"
         // let positionLeft = index * 14 + 'px'
         this.left = positionLeft
         this.showContentEdit = true
         // 获取 # 的childNode
         for (let i = 0; i < obj.childNodes.length; i++) {
-          if (obj.childNodes[i].textContent.indexOf('#') >= 0) {
+          if (obj.childNodes[i].textContent.indexOf("#") >= 0) {
             this.insertChildIndex = i
             break
           }
@@ -168,9 +170,9 @@ export default {
       // 移动光标 跟上面的点击 每次都要获取最新的光标位置
       let parentNode = getSelection().anchorNode.parentElement
       let classKeyWord = parentNode.className
-      if (classKeyWord === 'keyWord') {
+      if (classKeyWord === "keyWord") {
         if ((e.keyCode !== 37 && e.keyCode !== 38 && e.keyCode !== 39 && e.keyCode !== 40)) {
-          let obj = document.getElementById('messageDesc')
+          let obj = document.getElementById("messageDesc")
           let position = 0
           for (let j = 0; j < obj.childNodes.length; j++) {
             if (obj.childNodes[j] === lastEditRange.endContainer.parentNode) {
@@ -187,15 +189,15 @@ export default {
                 sel = window.getSelection()
               }
               if (obj.childNodes.length - 1 <= position) { // 在最后 而且最后还没其他node节点 那么就在最后插入一个空格节点
-                obj.innerHTML = obj.innerHTML + '&nbsp;'
+                obj.innerHTML = obj.innerHTML + "&nbsp;"
               }
               let textContent = obj.childNodes[position].textContent
               if (obj.childNodes[position]) {
                 if (obj.childNodes[position].nodeType === 1) { // span节点
-                  let emptyNode = document.createTextNode(' ')
+                  let emptyNode = document.createTextNode(" ")
                   obj.insertBefore(emptyNode, obj.childNodes[position])
-                } else if (textContent.charAt(0) !== ' ') { // 后面的文本节点开头不是空格  就加个空格
-                  obj.childNodes[position].textContent = ' ' + textContent
+                } else if (textContent.charAt(0) !== " ") { // 后面的文本节点开头不是空格  就加个空格
+                  obj.childNodes[position].textContent = " " + textContent
                 }
               }
               obj.focus() // 解决ff不获取焦点无法定位问题
@@ -214,13 +216,13 @@ export default {
     },
     // 获取消息内容的字符串
     getMessageDesc () {
-      let str = ''
-      let nodes = document.querySelector('#messageDesc').childNodes
+      let str = ""
+      let nodes = document.querySelector("#messageDesc").childNodes
       for (let node of nodes) {
         if (node.nodeType === 3) {
-          str += node.nodeValue.trim().replace('#', '')
+          str += node.nodeValue.trim().replace("#", "")
         } else {
-          str += '[' + node.attributes.node.value.trim() + ']'
+          str += "[" + node.attributes.node.value.trim() + "]"
         }
       }
       return str
@@ -228,18 +230,18 @@ export default {
     // 解析消息内容的字符串
     parseMessageDesc () {
       let str = this.messageDescStr
-      let result = ''
-      if (str.length > 0 && str.indexOf('[') < 0) { // 纯文本
+      let result = ""
+      if (str.length > 0 && str.indexOf("[") < 0) { // 纯文本
         result = str
         return result
       }
-      let subStr = ''
-      while (str.indexOf('[') >= 0) {
-        let startIndex = str.indexOf('[')
-        let endIndex = str.indexOf(']')
-        if (str.indexOf('[') === 0) {
+      let subStr = ""
+      while (str.indexOf("[") >= 0) {
+        let startIndex = str.indexOf("[")
+        let endIndex = str.indexOf("]")
+        if (str.indexOf("[") === 0) {
           let code = str.substring(startIndex + 1, endIndex)
-          result += '&nbsp;<span class="keyWord" node="' + code + '">' + this.selectDataList[code] + '</span>&nbsp;'
+          result += "&nbsp;<span class=\"keyWord\" node=\"" + code + "\">" + this.selectDataList[code] + "</span>&nbsp;"
           str = str.substring(endIndex + 1)
         } else {
           subStr = str.substring(0, startIndex)
@@ -275,17 +277,17 @@ export default {
     }
   },
   watch: {
-    selectItemIndex (n, o) {
+    selectItemIndex (n) {
       if (n !== 0) {
-        document.getElementById('messageDesc').blur()
+        document.getElementById("messageDesc").blur()
       }
     }
   },
   created () { // 全局监听键盘事件
-    document.addEventListener('keydown', this.documentKeyMethod)
+    document.addEventListener("keydown", this.documentKeyMethod)
   },
   beforeDestroy () { // 组件销毁之前 把全局的事件解除了
-    document.removeEventListener('keydown', this.documentKeyMethod)
+    document.removeEventListener("keydown", this.documentKeyMethod)
   }
 }
 </script>
