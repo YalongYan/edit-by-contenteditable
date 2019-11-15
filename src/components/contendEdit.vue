@@ -67,7 +67,6 @@ export default {
       this.setLastEditRange()
     },
     setLastEditRange () {
-      console.log('删除')
       let selection = window.getSelection ? window.getSelection() : document.selection
       let range = selection.createRange ? selection.createRange() : selection.getRangeAt(0)
       lastSelection = selection
@@ -77,7 +76,6 @@ export default {
       //
     },
     itemClick (str) {
-      // console.log(str)
       // 创建节点
       let node = document.createElement('span')
       node.setAttribute('node', str)
@@ -93,7 +91,6 @@ export default {
       let result = this.getMessageDesc()
       this.selectItemIndex = 0
       this.$nextTick(() => {
-        console.log(result)
         this.$emit('update:messageDescStr', result)
         if (lastEditRange) {
           setTimeout(() => {
@@ -102,8 +99,6 @@ export default {
             // let range = window.getSelection() // 创建range
             // range.selectAllChildren(obj) // range 选择obj下所有子内容
             // range.collapseToEnd() // 光标移至最后
-            console.log(this.insertChildIndex)
-            console.log(obj.childNodes)
             let innerDivText = obj.childNodes[this.insertChildIndex + 2] // 1 是移动到插入节点的最后  2是移动到插入节点的下一个节点后面，相当于在插入节点后面的空格插入光标
             if (innerDivText.length > 0) {
               lastSelection.collapse(innerDivText, 1)
@@ -116,7 +111,6 @@ export default {
     },
     contendEditBlur () {
       // this.showContentEdit = false
-      // console.log(lastEditRange)
     },
     insertNodeAtCursor (node) {
       let range, html
@@ -172,7 +166,6 @@ export default {
     },
     // keydown 的时候 就把光标往后移动一位 移动到span后面的node里面
     contenteditableKeyDown (e) {
-      // console.log(e.keyCode)
       // 移动光标 跟上面的点击 每次都要获取最新的光标位置
       let parentNode = getSelection().anchorNode.parentElement
       let classKeyWord = parentNode.className
@@ -305,6 +298,13 @@ export default {
   border: 1px solid #d0d0d0;
   line-height: 32px;
   font-size: 14px;
+  // 得加上这个 不然点击下拉li的时候 有bug
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Chrome/Safari/Opera */
+  -khtml-user-select: none; /* Konqueror */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none;
 
   .selectCtnBgCover{
     position: fixed;
