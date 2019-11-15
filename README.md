@@ -1,4 +1,5 @@
-演示效果如下：
+演示效果如下： 
+
 
  ![演示图片](https://raw.githubusercontent.com/YalongYan/edit-by-contenteditable/master/src/assets/demo.gif)
 
