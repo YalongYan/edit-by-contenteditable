@@ -1,7 +1,7 @@
 <template>
    <ul class="contendEditSelectList" :style="{left: left}">
     <li v-for="(item, i) in list" :key="i" class="selectItem" :class="{on: (i + 1) === selectItemIndex}" code=item @click="itemClick(item)">
-      {{item}}
+      {{ selectDataList[item] }}
     </li>
    </ul>
 </template>
@@ -28,7 +28,6 @@ export default {
   },
   methods: {
     itemClick (str) {
-      console.log(str)
       this.$emit('itemClick', str)
     }
   },

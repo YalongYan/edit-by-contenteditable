@@ -47,7 +47,6 @@ export default {
   methods: {
     // 点击空白的背景
     selectCtnBgCoverClick () {
-      debugger
       this.showContentEdit = false
       this.insertChildIndex = 0
       this.selectItemIndex = 0
@@ -292,6 +291,8 @@ export default {
 </script>
 <style lang="scss">
 .editContentCtn{
+  // 不设置字体的话 空格的宽度会很宽
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
   position: relative;
   padding: 0 8px;
   border-radius: 2px;

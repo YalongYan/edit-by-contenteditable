@@ -3,9 +3,11 @@ var webpack = require('webpack')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const NODE_ENV = process.env.NODE_ENV
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 module.exports = {
-  entry: './src/main.js',
+  entry: NODE_ENV == 'development' ? './src/main.js' : './index.js',
   output: {
     path: path.resolve(__dirname, './dist'),
     publicPath: '/dist/',
@@ -94,7 +96,6 @@ module.exports = {
   performance: {
     hints: false
   },
-  devtool: '#eval-source-map',
   plugins: [
     new VueLoaderPlugin()
   ],
@@ -116,17 +117,23 @@ module.exports = {
 }
 
 if (process.env.NODE_ENV === 'production') {
-  module.exports.devtool = '#source-map'
+  // module.exports.devtool = '#source-map' // 生产环境就不要调试代码了。
   module.exports.mode = 'production'
-  // http://vue-loader.vuejs.org/en/workflow/production.html
+  // module.exports.plugins = (module.exports.plugins || []).concat([
+    // new webpack.DefinePlugin({
+    //   'process.env': {
+    //     NODE_ENV: '"production"'
+    //   }
+    // }),
+    // new MiniCssExtractPlugin({filename:'mian.css'}) // 这个是把css打包到一个文件，由于css不多， 就直接把css打包到 buil.js 里面了。
+  // ])
+} else if (process.env.NODE_ENV === 'analyse') {
+  module.exports.mode = 'development'
+  module.exports.devtool = '#eval-source-map',
   module.exports.plugins = (module.exports.plugins || []).concat([
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: '"production"'
-      }
-    }),
-    new MiniCssExtractPlugin({filename:'mian.css'})
+    new BundleAnalyzerPlugin()
   ])
 } else {
+  module.exports.devtool = '#eval-source-map'
   module.exports.mode = 'development'
 }
