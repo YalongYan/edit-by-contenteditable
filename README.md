@@ -61,3 +61,6 @@ lastSelection.collapse(childNode, index)
 
 #### 代码地址:
  [https://github.com/YalongYan/edit-by-contenteditable](https://github.com/YalongYan/edit-by-contenteditable)
+参考链接:
+ [https://segmentfault.com/a/1190000005869372](https://segmentfault.com/a/1190000005869372)
+[http://cn.voidcc.com/question/p-dchxjkvr-ye.html](http://cn.voidcc.com/question/p-dchxjkvr-ye.html)
