@@ -1,7 +1,7 @@
 {
   "name": "edit-by-contenteditable",
   "description": "使用div 的 contenteditable属性，实现输入编辑，输入 # 出现下拉选择，支持键盘选择",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "author": "yanyalong <1240277991@qq.com>",
   "license": "MIT",
   "private": false,

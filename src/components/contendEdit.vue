@@ -37,6 +37,7 @@ export default {
       }
     }
   },
+  name: "edit-by-contenteditable",
   data () {
     return {
       left: "0",
