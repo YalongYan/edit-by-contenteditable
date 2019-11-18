@@ -24,7 +24,7 @@ module.exports = {
     },
     testPathIgnorePatterns: [
         '<rootDir>/test/e2e'
-    ],
+    ], 
     // setupFiles: ['<rootDir>/test/unit/setup'],
     snapshotSerializers: ['<rootDir>/node_modules/jest-serializer-vue'],
     coverageDirectory: '<rootDir>/test/unit/coverage', // 覆盖率报告的目录
